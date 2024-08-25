@@ -256,7 +256,6 @@ growth_assumption = st.slider('Enter Growth Assumption (years)', min_value=1, ma
 today = datetime.today().strftime('%Y-%m-%d')
 
 # Fetch data for the chosen ticker
-ticker = st.text_input('Enter Stock Ticker Symbol', 'AAPL')  # Default to 'AAPL'
 stock_data = yf.download(ticker, start='2020-01-01', end=today)
 
 # Create a Plotly figure
