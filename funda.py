@@ -88,7 +88,7 @@ def fetch_financial_data(ticker, growth_assumption):
    
 
    # Calculate Free Cash Flow
-    financial_data['Free Cash Flow'] = financial_data['Operating Cash Flow'] / financial_data['Capital Expenditure']
+    financial_data['Free Cash Flow'] = cash_flow_statement['Free Cash Flow].iloc[0]
 
     # Calculate Project Cash flow year 1
     financial_data['Projected Cash Flow Year 1'] = financial_data['Free Cash Flow'] * (1 + growth_rate)
