@@ -88,36 +88,36 @@ def fetch_financial_data(ticker, growth_assumption):
    
 
    # Calculate Free Cash Flow
-    financial_data['Free Cash Flow'] = cash_flow_statement['Free Cash Flow'].iloc[0]
+    financial_data['Free Cash Flow'] = cash_flow_statement['Operating Cash Flow'].iloc[0] - abs(cash_flow_statement['Capital Expenditure'].iloc[0])
 
-    # Calculate Project Cash flow year 1
-    financial_data['Projected Cash Flow Year 1'] = financial_data['Free Cash Flow'] * (1 + growth_rate)
+# Projected Cash Flows for 5 Years
+    financial_data['Projected Cash Flows'] = []
+    previous_cash_flow = financial_data['Free Cash Flow']
+    for year in range(1, 6):
+        projected_cash_flow = previous_cash_flow * (1 + growth_rate)
+        financial_data[f'Projected Cash Flow Year {year}'] = projected_cash_flow
+        financial_data['Projected Cash Flows'].append(projected_cash_flow)
+        previous_cash_flow = projected_cash_flow
 
-    # Calculate Project Cash flow year 2
-    financial_data['Projected Cash Flow Year 2'] = financial_data['Projected Cash Flow Year 1'] * (1 + growth_rate)
+# Terminal Value Calculation
+    if financial_data['WACC'] <= perpetual_growth_rate:
+        st.error("WACC must be greater than the perpetual growth rate to calculate Terminal Value.")
+    else:
+        financial_data['Terminal Value'] = financial_data['Projected Cash Flow Year 5'] * (1 + perpetual_growth_rate) / (financial_data['WACC'] - perpetual_growth_rate)
 
-    # Calculate Project Cash flow year 3
-    financial_data['Projected Cash Flow Year 3'] = financial_data['Projected Cash Flow Year 2'] * (1 + growth_rate)
+# Enterprise Value Calculation
+    financial_data['Enterprise Value'] = npf.npv(financial_data['WACC']/100, financial_data['Projected Cash Flows']) + financial_data['Terminal Value'] / ((1 + financial_data['WACC']/100) ** 5)
 
-    # Calculate Project Cash flow year 4
-    financial_data['Projected Cash Flow Year 4'] = financial_data['Projected Cash Flow Year 3'] * (1 + growth_rate)
-
-    # Calculate Project Cash flow year 5
-    financial_data['Projected Cash Flow Year 5'] = financial_data['Projected Cash Flow Year 4'] * (1 + growth_rate)
-
-    cash_flows = [financial_data['Projected Cash Flow Year 1'],financial_data['Projected Cash Flow Year 2'],financial_data['Projected Cash Flow Year 3'],financial_data['Projected Cash Flow Year 4'],financial_data['Projected Cash Flow Year 5']]
-    
-    
-    financial_data['Terminal Value'] = financial_data['Projected Cash Flow Year 5'] * (1 + perpetual_growth_rate) / (financial_data['WACC'] - perpetual_growth_rate)
-    
-    # Enterprise Value Calculation
-    financial_data['Enterprise Value'] = npf.npv(financial_data['WACC'], cash_flows) + financial_data['Terminal Value'] / ((1 + financial_data['WACC']) ** 5)
-
-    # Calculate Equity Value
+# Calculate Equity Value
     financial_data['Equity Value'] = financial_data['Enterprise Value'] - financial_data['Total Debt'] + financial_data['Cash and Cash Equivalents']
+
+# Calculate Intrinsic Value 5 Year Projected Cash Flow
+    if financial_data['Outstanding Shares'] == 0:
+        st.error("Outstanding Shares cannot be zero.")
+    else:
+        financial_data['Intrinsic Value 5 Year Projected Cash Flow'] = financial_data['Equity Value'] / financial_data['Outstanding Shares']
+
     
-    # Calculate Intrinsic Value 5 Year Projected Cash Flow
-    financial_data['Intrinsic Value 5 Year Projected Cash Flow'] = financial_data['Equity Value'] / financial_data['Outstanding Shares']
 
     
     # Free Cash flow year 2023
