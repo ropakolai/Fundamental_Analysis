@@ -4,7 +4,7 @@ import pandas as pd
 import datetime
 import numpy as np 
 import numpy_financial as npf
-from datetime import datetime
+from datetime
 
 
 def fetch_financial_data(ticker, growth_assumption):
