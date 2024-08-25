@@ -2,6 +2,7 @@ import streamlit as st
 import yfinance as yf
 import pandas as pd
 import datetime
+import numpy
 
 def fetch_financial_data(ticker, growth_assumption):
     # Fetch stock data using yfinance
