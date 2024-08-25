@@ -252,47 +252,56 @@ st.title('Financial Data and Valuation')
 ticker = st.text_input('Enter Stock Ticker Symbol', 'AAPL')
 growth_assumption = st.slider('Enter Growth Assumption (years)', min_value=1, max_value=30, value=15)
 
-# Get today's date
-today = datetime.today().strftime('%Y-%m-%d')
+if ticker:
+    try:
+        # Get today's date
+        today = datetime.today().strftime('%Y-%m-%d')
 
-# Fetch data for the chosen ticker
-stock_data = yf.download(ticker, start='2020-01-01', end=today)
+        # Fetch data for the chosen ticker
+        stock_data = yf.download(ticker, start='2020-01-01', end=today)
+        
+        # Check if data is available
+        if stock_data.empty:
+            st.error(f"No data found for ticker {ticker}. Please check the ticker symbol and try again.")
+        else:
+            # Create a Plotly figure
+            fig = go.Figure()
 
-# Create a Plotly figure
-fig = go.Figure()
+            # Add a trace for the closing price
+            fig.add_trace(go.Scatter(x=stock_data.index, y=stock_data['Close'], mode='lines', name='Closing Price'))
 
-# Add a trace for the closing price
-fig.add_trace(go.Scatter(x=stock_data.index, y=stock_data['Close'], mode='lines', name='Closing Price'))
+            # Customize the layout
+            fig.update_layout(
+                title=f'{ticker} Closing Price Over Time',
+                xaxis_title='Date',
+                yaxis_title='Closing Price (USD)',
+                template='plotly_dark'
+            )
 
-# Customize the layout
-fig.update_layout(
-    title=f'{ticker} Closing Price Over Time',
-    xaxis_title='Date',
-    yaxis_title='Closing Price (USD)',
-    template='plotly_dark'
-)
+            # Display the plot in Streamlit
+            st.subheader(f'{ticker} Stock Closing Price')
+            st.plotly_chart(fig)
+        
+        if growth_assumption:
+            # Fetch financial data
+            financial_data = fetch_financial_data(ticker, growth_assumption)
 
-# Display the plot in Streamlit
-st.title(f'{ticker} Stock Closing Price')
-st.plotly_chart(fig)
+            # Convert financial data to DataFrame
+            financial_df = pd.DataFrame(list(financial_data.items()), columns=['Key', 'Value'])
 
-if ticker and growth_assumption:
-    # Fetch financial data
-    financial_data = fetch_financial_data(ticker, growth_assumption)
+            # Display the financial data
+            st.write(f"Financial data for {ticker}:")
+            st.dataframe(financial_df)
+            
+            # Fetch Piotroski F-Score
+            piotroski_scores_df = fetch_piotroski(ticker)
 
-    # Convert financial data to DataFrame
-    financial_df = pd.DataFrame(list(financial_data.items()), columns=['Key', 'Value'])
+            # Display Piotroski F-Score
+            st.write(f"Piotroski F-Score for {ticker}:")
+            st.dataframe(piotroski_scores_df)
 
-    # Display the financial data
-    st.write(f"Financial data for {ticker}:")
-    st.dataframe(financial_df)
-    
-    # Fetch Piotroski F-Score
-    piotroski_scores_df = fetch_piotroski(ticker)
-
-    # Display Piotroski F-Score
-    st.write(f"Piotroski F-Score for {ticker}:")
-    st.dataframe(piotroski_scores_df)
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
 
     # Custom CSS for positioning text
 custom_css = """
