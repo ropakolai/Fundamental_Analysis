@@ -253,22 +253,34 @@ ticker = st.text_input('Enter Stock Ticker Symbol', 'AAPL')
 growth_assumption = st.slider('Enter Growth Assumption (years)', min_value=1, max_value=30, value=15)
 
 if ticker and growth_assumption:
-    # Fetch financial data
-    financial_data = fetch_financial_data(ticker, growth_assumption)
+    try:
+        # Fetch financial data
+        financial_data = fetch_financial_data(ticker, growth_assumption)
 
-    # Convert financial data to DataFrame
-    financial_df = pd.DataFrame(list(financial_data.items()), columns=['Key', 'Value'])
+        # Check if financial data is available
+        if financial_data:
+            # Convert financial data to DataFrame
+            financial_df = pd.DataFrame(list(financial_data.items()), columns=['Key', 'Value'])
 
-    # Display the financial data
-    st.write(f"Financial data for {ticker}:")
-    st.dataframe(financial_df)
-    
-    # Fetch Piotroski F-Score
-    piotroski_scores_df = fetch_piotroski(ticker)
+            # Display the financial data
+            st.write(f"Financial data for {ticker}:")
+            st.dataframe(financial_df)
+        else:
+            st.error(f"No financial data found for ticker {ticker}.")
 
-    # Display Piotroski F-Score
-    st.write(f"Piotroski F-Score for {ticker}:")
-    st.dataframe(piotroski_scores_df)
+        # Fetch Piotroski F-Score
+        piotroski_scores_df = fetch_piotroski(ticker)
+
+        # Check if Piotroski F-Score data is available
+        if not piotroski_scores_df.empty:
+            # Display Piotroski F-Score
+            st.write(f"Piotroski F-Score for {ticker}:")
+            st.dataframe(piotroski_scores_df)
+        else:
+            st.error(f"No Piotroski F-Score data found for ticker {ticker}.")
+
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
 
     # Custom CSS for positioning text
 custom_css = """
