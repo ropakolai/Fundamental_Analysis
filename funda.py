@@ -107,10 +107,11 @@ def fetch_financial_data(ticker, growth_assumption):
 
     cash_flows = [financial_data['Projected Cash Flow Year 1'],financial_data['Projected Cash Flow Year 2'],financial_data['Projected Cash Flow Year 3'],financial_data['Projected Cash Flow Year 4'],financial_data['Projected Cash Flow Year 5']]
     
-    financial_data['Terminal Value'] =  financial_data['Projected Cash Flow Year 5'] * (1 + perpetual_growth_rate) / (financial_data['WACC'] - perpetual_growth_rate)
+    
+    financial_data['Terminal Value'] = financial_data['Projected Cash Flow Year 5'] * (1 + perpetual_growth_rate) / (financial_data['WACC'] - perpetual_growth_rate)
     
     # Enterprise Value Calculation
-    financial_data['Enterprise Value'] = npf.npv(financial_data['WACC'],cash_flows) + financial_data['Terminal Value'] / ((1+financial_data['WACC'])**5)
+    financial_data['Enterprise Value'] = npf.npv(financial_data['WACC'], cash_flows) + financial_data['Terminal Value'] / ((1 + financial_data['WACC']) ** 5)
 
     # Calculate Equity Value
     financial_data['Equity Value'] = financial_data['Enterprise Value'] - financial_data['Total Debt'] + financial_data['Cash and Cash Equivalents']
