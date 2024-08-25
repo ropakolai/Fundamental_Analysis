@@ -84,21 +84,32 @@ def fetch_financial_data(ticker, growth_assumption):
     # Calculate ROIC
     financial_data['ROIC'] = financial_data['NOPAT'] / ((financial_data['Invested Capital 2023'] + financial_data['Invested Capital 2022']) / 2)
 
-    # Calculate Free Cash Flow
+   
+
+   # Calculate Free Cash Flow
     financial_data['Free Cash Flow'] = financial_data['Operating Cash Flow'] / financial_data['Capital Expenditure']
 
-    # Calculate Project Cash flow for 5 years
-    projected_cash_flows = []
-    cash_flow = financial_data['Free Cash Flow']
-    for _ in range(5):
-        cash_flow = cash_flow * (1 + growth_rate)
-        projected_cash_flows.append(cash_flow)
+    # Calculate Project Cash flow year 1
+    financial_data['Projected Cash Flow Year 1'] = financial_data['Free Cash Flow'] * (1 + growth_rate)
+
+    # Calculate Project Cash flow year 2
+    financial_data['Projected Cash Flow Year 2'] = financial_data['Projected Cash Flow Year 1'] * (1 + growth_rate)
+
+    # Calculate Project Cash flow year 3
+    financial_data['Projected Cash Flow Year 3'] = financial_data['Projected Cash Flow Year 2'] * (1 + growth_rate)
+
+    # Calculate Project Cash flow year 4
+    financial_data['Projected Cash Flow Year 4'] = financial_data['Projected Cash Flow Year 3'] * (1 + growth_rate)
+
+    # Calculate Project Cash flow year 5
+    financial_data['Projected Cash Flow Year 5'] = financial_data['Projected Cash Flow Year 4'] * (1 + growth_rate)
+
+    cash_flows = [financial_data['Projected Cash Flow Year 1'],financial_data['Projected Cash Flow Year 2'],financial_data['Projected Cash Flow Year 3'],financial_data['Projected Cash Flow Year 4'],financial_data['Projected Cash Flow Year 5']]
     
-    financial_data['Projected Cash Flow Year 5'] = projected_cash_flows[-1]
     financial_data['Terminal Value'] =  financial_data['Projected Cash Flow Year 5'] * (1 + perpetual_growth_rate) / (financial_data['WACC'] - perpetual_growth_rate)
     
     # Enterprise Value Calculation
-    financial_data['Enterprise Value'] = financial_data['Market Cap'] + financial_data['Total Debt'] - financial_data['Cash and Cash Equivalents']
+    financial_data['Enterprise Value'] = np.npv(financial_data['WACC'],cash_flows) + financial_data['Terminal Value'] / ((1+financial_data['WACC'])**5)
 
     # Calculate Equity Value
     financial_data['Equity Value'] = financial_data['Enterprise Value'] - financial_data['Total Debt'] + financial_data['Cash and Cash Equivalents']
