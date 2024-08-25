@@ -4,6 +4,9 @@ import pandas as pd
 import datetime
 import numpy as np 
 import numpy_financial as npf
+import plotly.graph_objs as go
+from datetime import datetime
+
 
 def fetch_financial_data(ticker, growth_assumption):
     # Fetch stock data using yfinance
@@ -248,6 +251,31 @@ st.title('Financial Data and Valuation')
 # Inputs
 ticker = st.text_input('Enter Stock Ticker Symbol', 'AAPL')
 growth_assumption = st.slider('Enter Growth Assumption (years)', min_value=1, max_value=30, value=15)
+
+# Get today's date
+today = datetime.today().strftime('%Y-%m-%d')
+
+# Fetch data for the chosen ticker
+ticker = st.text_input('Enter Stock Ticker Symbol', 'AAPL')  # Default to 'AAPL'
+stock_data = yf.download(ticker, start='2020-01-01', end=today)
+
+# Create a Plotly figure
+fig = go.Figure()
+
+# Add a trace for the closing price
+fig.add_trace(go.Scatter(x=stock_data.index, y=stock_data['Close'], mode='lines', name='Closing Price'))
+
+# Customize the layout
+fig.update_layout(
+    title=f'{ticker} Closing Price Over Time',
+    xaxis_title='Date',
+    yaxis_title='Closing Price (USD)',
+    template='plotly_dark'
+)
+
+# Display the plot in Streamlit
+st.title(f'{ticker} Stock Closing Price')
+st.plotly_chart(fig)
 
 if ticker and growth_assumption:
     # Fetch financial data
