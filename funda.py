@@ -21,7 +21,7 @@ def fetch_financial_data(ticker, growth_assumption):
     risk_free_rate = 0.0459
     market_return = 0.085
     growth_rate = 0.01
-    perpetual_growth_rate = 0.025
+    perpetual_growth_rate = 0.02
     growth_multiple = 8.3459 * (1.07) ** (growth_assumption - 4)
 
     # Total Debt
