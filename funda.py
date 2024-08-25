@@ -4,7 +4,6 @@ import pandas as pd
 import datetime
 import numpy as np 
 import numpy_financial as npf
-import plotly.graph_objs as go
 from datetime import datetime
 
 
