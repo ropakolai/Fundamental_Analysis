@@ -279,9 +279,6 @@ def fetch_piotroski(ticker):
     
     return scores_df
     
- # Obtenir le prix actuel
-    current_price = stock.info.get('regularMarketPrice', 'Not Found')
-    
 
 
 # Streamlit app
@@ -291,8 +288,10 @@ st.title('Financial Data and Valuation')
 ticker = st.text_input('Enter Stock Ticker Symbol', 'AAPL')
 growth_assumption = st.slider('Enter Growth Assumption (%)', min_value=1, max_value=15, value=15)
 
+ # Obtenir le prix actuel
+current_price = stock.info.get('regularMarketPrice', 'Not Found')
 # Afficher le cours actuel
-st.write(f"Le cours actuel de {ticker} est : ${current_price}")
+st.write(f"The actual closing price of {ticker} is: ${current_price}")
 
 if ticker and growth_assumption:
     try:
