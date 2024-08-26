@@ -42,6 +42,7 @@ def fetch_financial_data(ticker, growth_assumption):
     except (KeyError, IndexError):
         financial_data['Interest Expense'] = 0
 
+
     # Income Tax Expense
     financial_data['Tax Provision'] = income_statement['Tax Provision'].iloc[0]
 
