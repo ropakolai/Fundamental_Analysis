@@ -138,7 +138,7 @@ def fetch_financial_data(ticker, growth_assumption):
     # Free Cash flow year 2020
     try:
         year = str(datetime.datetime.now().year - 4)
-        financial_data[f'Free Cash Flow year {year}'] = cash_flow_statement.loc[year, 'Free Cash Flow']
+        financial_data[f'Free Cash Flow year {year}'] = cash_flow_statement.loc[year, 'Free Cash Flow'].iloc[0]
     except (KeyError, IndexError):
         financial_data[f'Free Cash Flow year {year}'] = 0
         
