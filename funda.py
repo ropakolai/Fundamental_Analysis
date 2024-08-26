@@ -6,40 +6,6 @@ import numpy as np
 import numpy_financial as npf
 import datetime
 
-# Function to fetch financial metrics
-def fetch_financial_metrics(ticker):
-    stock = yf.Ticker(ticker)
-    
-    # Operating Margin
-    operating_margin = stock.financials['Operating Income'].iloc[0] / stock.financials['Total Revenue'].iloc[0]
-    
-    # Dividend Yield
-    dividend_yield = stock.info['dividendYield'] * 100 if stock.info['dividendYield'] else 0
-    
-    # Dividend Cover (Earnings per share / Dividends per share)
-    dividend_cover = stock.info['trailingEps'] / stock.info['dividendRate'] if stock.info['dividendRate'] else None
-    
-    # Debt/EBITDA
-    total_debt = stock.balance_sheet['Long Term Debt'].iloc[0] + stock.balance_sheet['Short Long Term Debt'].iloc[0]
-    ebitda = stock.financials['Ebitda'].iloc[0]
-    debt_to_ebitda = total_debt / ebitda if ebitda else None
-    
-    # P/E Ratio
-    pe_ratio = stock.info['trailingPE']
-    
-    # PEG Ratio
-    peg_ratio = stock.info['pegRatio']
-    
-    
-    return {
-        "Operating Margin": operating_margin,
-        "Dividend Yield (%)": dividend_yield,
-        "Dividend Cover": dividend_cover,
-        "Debt/EBITDA": debt_to_ebitda,
-        "P/E Ratio": pe_ratio,
-        "PEG Ratio": peg_ratio
-    }
-
 
 def fetch_financial_data(ticker, growth_assumption):
     # Fetch stock data using yfinance
@@ -184,6 +150,26 @@ def fetch_financial_data(ticker, growth_assumption):
 
     # Intrinsic Value 
     financial_data['Intrinsic Value'] = financial_data['Value'] / financial_data['Outstanding Shares']    
+
+    # Operating Margin
+    financial_data['Operating Margin'] = financial_data['Operating Income'] / financial_data['Total Revenue']
+    
+    # Dividend Yield
+    financial_data['Dividend Yield'] = stock.info['dividendYield'] * 100 if stock.info['dividendYield'] else 0
+    
+    # Dividend Cover (Earnings per share / Dividends per share)
+    financial_data['Dividend Cover'] = stock.info['trailingEps'] / stock.info['dividendRate'] if stock.info['dividendRate'] else None
+    
+    # Debt/EBITDA
+    ebitda = stock.financials['Ebitda'].iloc[0]
+    financial_data['Debt/EBITDA'] = financial_data['Total Debt'] / ebitda if ebitda else None
+    
+    # P/E Ratio
+    financial_data['P/E Ratio'] = stock.info['trailingPE']
+    
+    # PEG Ratio
+    financial_data['PEG Ratio'] = stock.info['pegRatio']
+    
     return financial_data
 
 def fetch_piotroski(ticker):
@@ -298,17 +284,6 @@ ticker = st.text_input('Enter Stock Ticker Symbol', 'AAPL')
 growth_assumption = st.slider('Enter Growth Assumption (%)', min_value=1, max_value=15, value=15)
 
 if ticker and growth_assumption:
-
-    # Fetch financial metrics
-    financial_metrics = fetch_financial_metrics(ticker)
-    
-    # Convert financial metrics to DataFrame for display
-    metrics_df = pd.DataFrame(list(financial_metrics.items()), columns=['Metric', 'Value'])
-    
-    # Display the financial metrics
-    st.write(f"Financial metrics for {ticker}:")
-    st.dataframe(metrics_df)
-    
     try:
         # Fetch financial data
         financial_data = fetch_financial_data(ticker, growth_assumption)
