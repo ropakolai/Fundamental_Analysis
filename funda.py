@@ -250,7 +250,7 @@ st.title('Financial Data and Valuation')
 
 # Inputs
 ticker = st.text_input('Enter Stock Ticker Symbol', 'AAPL')
-growth_assumption = st.slider('Enter Growth Assumption (years)', min_value=1, max_value=30, value=15)
+growth_assumption = st.slider('Enter Growth Assumption (%)', min_value=1, max_value=30, value=15)
 
 if ticker and growth_assumption:
     try:
