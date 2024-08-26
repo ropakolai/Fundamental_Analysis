@@ -15,6 +15,7 @@ def fetch_financial_data(ticker, growth_assumption):
     income_statement = stock.financials.T
     cash_flow_statement = stock.cashflow.T
     balance_sheet = stock.balance_sheet.T
+    stats = stock.stats()
 
     # Extract necessary fields
     financial_data = {}
@@ -171,7 +172,7 @@ def fetch_financial_data(ticker, growth_assumption):
     financial_data['P/E Ratio'] = stock.info['trailingPE']
     
     # PEG Ratio
-    financial_data['PEG Ratio'] = stock.info['pegRatio']
+    financial_data['PEG Ratio'] = stats['Valuation Measures']['PEG Ratio (5 yr expected)']
     
     return financial_data
 
