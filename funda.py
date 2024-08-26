@@ -49,6 +49,9 @@ def fetch_financial_data(ticker, growth_assumption):
     # Income Before Tax
     financial_data['Pretax Income'] = income_statement['Pretax Income'].iloc[0]
 
+     # Total Revenue
+    financial_data['Total Revenue'] = income_statement['Total Revenue'].iloc[0]
+
     # Operating Income
     financial_data['Operating Income'] = income_statement['Operating Income'].iloc[0]
 
