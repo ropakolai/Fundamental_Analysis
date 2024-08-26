@@ -37,7 +37,10 @@ def fetch_financial_data(ticker, growth_assumption):
     financial_data['Invested Capital 2022'] = balance_sheet['Total Assets'].iloc[1] - balance_sheet['Total Liabilities Net Minority Interest'].iloc[1]
 
     # Interest Expense
-    financial_data['Interest Expense'] = income_statement['Interest Expense'].iloc[0]
+    try:
+        financial_data['Interest Expense'] = income_statement['Interest Expense'].iloc[0]
+    except (KeyError, IndexError):
+        financial_data['Interest Expense'] = 0
 
     # Income Tax Expense
     financial_data['Tax Provision'] = income_statement['Tax Provision'].iloc[0]
