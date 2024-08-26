@@ -172,7 +172,7 @@ def fetch_financial_data(ticker, growth_assumption):
     financial_data['P/E Ratio'] = stock.info['trailingPE']
     
     # PEG Ratio
-    financial_data['PEG Ratio'] = stats['Valuation Measures']['PEG Ratio (5 yr expected)']
+    financial_data['PEG Ratio'] = stock.info.get('pegRatio', 'Not Found')
     
     return financial_data
 
