@@ -30,11 +30,6 @@ def fetch_financial_metrics(ticker):
     # PEG Ratio
     peg_ratio = stock.info['pegRatio']
     
-    # ROIC (Return on Invested Capital)
-    roic =  financial_data['ROIC']
-    
-
-    wacc = financial_data['WACC']
     
     return {
         "Operating Margin": operating_margin,
@@ -42,9 +37,7 @@ def fetch_financial_metrics(ticker):
         "Dividend Cover": dividend_cover,
         "Debt/EBITDA": debt_to_ebitda,
         "P/E Ratio": pe_ratio,
-        "PEG Ratio": peg_ratio,
-        "ROIC (%)": roic,
-        "WACC (%)": wacc
+        "PEG Ratio": peg_ratio
     }
 
 
