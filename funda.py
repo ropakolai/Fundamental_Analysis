@@ -208,7 +208,7 @@ def fetch_piotroski(ticker):
         long_term_debt_prev = balance_sheet['Long Term Debt'].iloc[previous_year]
         current_ratio = balance_sheet['Current Assets'].iloc[current_year] / balance_sheet['Current Liabilities'].iloc[current_year]
         current_ratio_prev = balance_sheet['Current Assets'].iloc[previous_year] / balance_sheet['Current Liabilities'].iloc[previous_year]
-
+        
         gross_margin = income_statement['Gross Profit'].iloc[current_year] / income_statement['Total Revenue'].iloc[current_year]
         gross_margin_prev = income_statement['Gross Profit'].iloc[previous_year] / income_statement['Total Revenue'].iloc[previous_year]
         asset_turnover = income_statement['Total Revenue'].iloc[current_year] / total_assets
