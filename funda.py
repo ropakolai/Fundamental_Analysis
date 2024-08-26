@@ -164,7 +164,7 @@ def fetch_financial_data(ticker, growth_assumption):
     financial_data['Dividend Cover'] = stock.info['trailingEps'] / stock.info['dividendRate'] if stock.info['dividendRate'] else None
     
     # Debt/EBITDA
-    ebitda = stock.financials['Ebitda'].iloc[0]
+    ebitda = stock.financials['EBITDA'].iloc[0]
     financial_data['Debt/EBITDA'] = financial_data['Total Debt'] / ebitda if ebitda else None
     
     # P/E Ratio
