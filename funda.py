@@ -15,7 +15,7 @@ def fetch_financial_data(ticker, growth_assumption):
     income_statement = stock.financials.T
     cash_flow_statement = stock.cashflow.T
     balance_sheet = stock.balance_sheet.T
-    stats = stock.stats()
+    
 
     # Extract necessary fields
     financial_data = {}
