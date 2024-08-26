@@ -137,9 +137,10 @@ def fetch_financial_data(ticker, growth_assumption):
 
     # Free Cash flow year 2020
     try:
-        financial_data[f'Free Cash flow year {datetime.datetime.now().year -4 }'] = cash_flow_statement.loc[str(datetime.datetime.now().year -4 ), 'Free Cash Flow'].iloc[0]
+        year = str(datetime.datetime.now().year - 4)
+        financial_data[f'Free Cash Flow year {year}'] = cash_flow_statement.loc[year, 'Free Cash Flow']
     except (KeyError, IndexError):
-        financial_data[f'Free Cash flow year {datetime.datetime.now().year -4 }'] = 0
+        financial_data[f'Free Cash Flow year {year}'] = 0
         
     # Total Equity
     financial_data['Total Equity'] = balance_sheet['Total Equity Gross Minority Interest'].iloc[0]
