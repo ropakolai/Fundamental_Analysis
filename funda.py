@@ -11,7 +11,7 @@ def fetch_financial_metrics(ticker):
     stock = yf.Ticker(ticker)
     
     # Operating Margin
-    operating_margin = stock.financials.loc['Operating Income'].iloc[0] / stock.financials.loc['Total Revenue'].iloc[0]
+    operating_margin = stock.financials['Operating Income'].iloc[0] / stock.financials['Total Revenue'].iloc[0]
     
     # Dividend Yield
     dividend_yield = stock.info['dividendYield'] * 100 if stock.info['dividendYield'] else 0
@@ -20,8 +20,8 @@ def fetch_financial_metrics(ticker):
     dividend_cover = stock.info['trailingEps'] / stock.info['dividendRate'] if stock.info['dividendRate'] else None
     
     # Debt/EBITDA
-    total_debt = stock.balance_sheet.loc['Long Term Debt'].iloc[0] + stock.balance_sheet.loc['Short Long Term Debt'].iloc[0]
-    ebitda = stock.financials.loc['Ebitda'].iloc[0]
+    total_debt = stock.balance_sheet['Long Term Debt'].iloc[0] + stock.balance_sheet['Short Long Term Debt'].iloc[0]
+    ebitda = stock.financials['Ebitda'].iloc[0]
     debt_to_ebitda = total_debt / ebitda if ebitda else None
     
     # P/E Ratio
