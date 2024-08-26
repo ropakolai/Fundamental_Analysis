@@ -6,6 +6,47 @@ import numpy as np
 import numpy_financial as npf
 import datetime
 
+# Function to fetch financial metrics
+def fetch_financial_metrics(ticker):
+    stock = yf.Ticker(ticker)
+    
+    # Operating Margin
+    operating_margin = stock.financials.loc['Operating Income'].iloc[0] / stock.financials.loc['Total Revenue'].iloc[0]
+    
+    # Dividend Yield
+    dividend_yield = stock.info['dividendYield'] * 100 if stock.info['dividendYield'] else 0
+    
+    # Dividend Cover (Earnings per share / Dividends per share)
+    dividend_cover = stock.info['trailingEps'] / stock.info['dividendRate'] if stock.info['dividendRate'] else None
+    
+    # Debt/EBITDA
+    total_debt = stock.balance_sheet.loc['Long Term Debt'].iloc[0] + stock.balance_sheet.loc['Short Long Term Debt'].iloc[0]
+    ebitda = stock.financials.loc['Ebitda'].iloc[0]
+    debt_to_ebitda = total_debt / ebitda if ebitda else None
+    
+    # P/E Ratio
+    pe_ratio = stock.info['trailingPE']
+    
+    # PEG Ratio
+    peg_ratio = stock.info['pegRatio']
+    
+    # ROIC (Return on Invested Capital)
+    roic =  financial_data['ROIC']
+    
+
+    wacc = financial_data['WACC']
+    
+    return {
+        "Operating Margin": operating_margin,
+        "Dividend Yield (%)": dividend_yield,
+        "Dividend Cover": dividend_cover,
+        "Debt/EBITDA": debt_to_ebitda,
+        "P/E Ratio": pe_ratio,
+        "PEG Ratio": peg_ratio,
+        "ROIC (%)": roic,
+        "WACC (%)": wacc
+    }
+
 
 def fetch_financial_data(ticker, growth_assumption):
     # Fetch stock data using yfinance
@@ -264,6 +305,17 @@ ticker = st.text_input('Enter Stock Ticker Symbol', 'AAPL')
 growth_assumption = st.slider('Enter Growth Assumption (%)', min_value=1, max_value=15, value=15)
 
 if ticker and growth_assumption:
+
+    # Fetch financial metrics
+    financial_metrics = fetch_financial_metrics(ticker)
+    
+    # Convert financial metrics to DataFrame for display
+    metrics_df = pd.DataFrame(list(financial_metrics.items()), columns=['Metric', 'Value'])
+    
+    # Display the financial metrics
+    st.write(f"Financial metrics for {ticker}:")
+    st.dataframe(metrics_df)
+    
     try:
         # Fetch financial data
         financial_data = fetch_financial_data(ticker, growth_assumption)
