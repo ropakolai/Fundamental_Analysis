@@ -27,13 +27,8 @@ def fetch_financial_data(ticker, growth_assumption):
     perpetual_growth_rate = 0.02
     growth_multiple = 8.3459 * (1.07) ** (growth_assumption - 4)
 
-    # Total Debt
-    # Get Long Term Debt and Short/Current Long-Term Debt
-    long_term_debt = balance_sheet.loc['Long Term Debt'][0] if 'Long Term Debt' in balance_sheet.index else 0
-    short_long_term_debt = balance_sheet.loc['Short Long Term Debt'][0] if 'Short Long Term Debt' in balance_sheet.index else 0
-
    # Calculate Total Debt
-    financial_data['Total Debt']= long_term_debt + short_long_term_debt
+    financial_data['Total Debt']= balance_sheet['Total Debt'].iloc[0]
 
     # Cash and Cash Equivalents
     financial_data['Cash and Cash Equivalents'] = balance_sheet['Cash And Cash Equivalents'].iloc[0]
