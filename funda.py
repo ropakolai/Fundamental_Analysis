@@ -157,6 +157,12 @@ def fetch_piotroski(ticker):
     income_statement = stock.financials.T
     cash_flow_statement = stock.cashflow.T
 
+    # Initialize the scores with default values
+    profitability_score = 0
+    leverage_liquidity_source_of_funds_score = 0
+    operating_efficiency_score = 0
+    total_score = 0
+
     # Extract necessary fields
     financial_data = {}
 
