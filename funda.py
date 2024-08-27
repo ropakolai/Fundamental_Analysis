@@ -293,10 +293,15 @@ if ticker:
     try:
         # Récupérer les données pour le ticker
         stock = yf.Ticker(ticker)
-        current_price = stock.history(period='1d')['Close'].iloc[0]
+        stock_history = stock.history(period='1d')
 
-        # Afficher le prix de l'action
-        st.write(f"Le prix actuel de l'action {ticker} est : ${current_price:.2f}")
+        # Vérifier si des données sont disponibles
+        if not stock_history.empty:
+            current_price = stock_history['Close'].iloc[0]
+            # Afficher le prix de l'action
+            st.write(f"Le prix actuel de l'action {ticker} est : ${current_price:.2f}")
+        else:
+            st.warning(f"Aucune donnée disponible pour le ticker {ticker}.")
 
         if growth_assumption:
             # Fetch financial data
