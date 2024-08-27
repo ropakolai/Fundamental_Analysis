@@ -288,46 +288,33 @@ st.title('Financial Data and Valuation')
 ticker = st.text_input('Enter Stock Ticker Symbol', 'AAPL')
 growth_assumption = st.slider('Enter Growth Assumption (%)', min_value=1, max_value=15, value=15)
 
-# Vérifier si un ticker a été entré
-if ticker:
+if ticker and growth_assumption:
     try:
-        # Récupérer les données pour le ticker
-        stock = yf.Ticker(ticker)
-        stock_history = stock.history(period='1d')
+        # Fetch financial data
+        financial_data = fetch_financial_data(ticker, growth_assumption)
 
-        # Vérifier si des données sont disponibles
-        if not stock_history.empty:
-            current_price = stock_history['Close'].iloc[0]
-            # Afficher le prix de l'action
-            st.write(f"Le prix actuel de l'action {ticker} est : ${current_price:.2f}")
+        # Check if financial data is available
+        if financial_data:
+            # Convert financial data to DataFrame
+            financial_df = pd.DataFrame(list(financial_data.items()), columns=['Key', 'Value'])
+
+            # Display the financial data
+            st.write(f"Financial data for {ticker}:")
+            st.dataframe(financial_df)
         else:
-            st.warning(f"Aucune donnée disponible pour le ticker {ticker}.")
+            st.error(f"No financial data found for ticker {ticker}.")
 
-        if growth_assumption:
-            # Fetch financial data
-            financial_data = fetch_financial_data(ticker, growth_assumption)
+        # Fetch Piotroski F-Score
+        piotroski_scores_df = fetch_piotroski(ticker)
 
-            # Check if financial data is available
-            if financial_data:
-                # Convert financial data to DataFrame
-                financial_df = pd.DataFrame(list(financial_data.items()), columns=['Key', 'Value'])
+        # Check if Piotroski F-Score data is available
+        if not piotroski_scores_df.empty:
+            # Display Piotroski F-Score
+            st.write(f"Piotroski F-Score for {ticker}:")
+            st.dataframe(piotroski_scores_df)
+        else:
+            st.error(f"No Piotroski F-Score data found for ticker {ticker}.")
 
-                # Display the financial data
-                st.write(f"Financial data for {ticker}:")
-                st.dataframe(financial_df)
-            else:
-                st.error(f"No financial data found for ticker {ticker}.")
-
-            # Fetch Piotroski F-Score
-            piotroski_scores_df = fetch_piotroski(ticker)
-
-            # Check if Piotroski F-Score data is available
-            if not piotroski_scores_df.empty:
-                # Display Piotroski F-Score
-                st.write(f"Piotroski F-Score for {ticker}:")
-                st.dataframe(piotroski_scores_df)
-            else:
-                st.error(f"No Piotroski F-Score data found for ticker {ticker}.")
     except Exception as e:
         st.error(f"An error occurred: {e}")
 
