@@ -157,12 +157,7 @@ def fetch_financial_data(ticker, growth_assumption):
 
     # Operating Margin
     financial_data['Operating Margin'] = financial_data['Operating Income'] / financial_data['Total Revenue']
-    
-    # Dividend Yield
-    financial_data['Dividend Yield'] = stock.info['dividendYield'] * 100 if stock.info.get('dividendYield') is not None else "Not Found"
-    
-    # Dividend Cover (Earnings per share / Dividends per share)
-    financial_data['Dividend Cover'] = stock.info['trailingEps'] / stock.info['dividendRate'] if stock.info['dividendRate'] else None
+
     
     # Debt/EBITDA
     ebitda = income_statement['EBITDA'].iloc[0]
