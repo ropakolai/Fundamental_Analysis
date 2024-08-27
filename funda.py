@@ -288,6 +288,7 @@ st.title('Financial Data and Valuation')
 ticker = st.text_input('Enter Stock Ticker Symbol', 'AAPL')
 growth_assumption = st.slider('Enter Growth Assumption (%)', min_value=1, max_value=15, value=15)
 
+stock = yf.Ticker(ticker)
 current_price = stock.history(period='1d')['Close'].iloc[0]
 
 # Afficher le prix de l'action
