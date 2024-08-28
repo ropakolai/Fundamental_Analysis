@@ -164,7 +164,7 @@ def fetch_financial_data(ticker, growth_assumption):
     financial_data['Debt/EBITDA'] = financial_data['Total Debt'] / ebitda if ebitda else None
     
     # P/E Ratio
-    financial_data['P/E Ratio'] = stock.info['trailingPE']
+    financial_data['P/E Ratio'] = stock.info.get('trailingPE', 'Not Found')
     
     # PEG Ratio
     financial_data['PEG Ratio'] = stock.info.get('pegRatio', 'Not Found')
