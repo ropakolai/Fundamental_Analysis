@@ -16,7 +16,6 @@ def fetch_financial_data(ticker, growth_assumption):
     cash_flow_statement = stock.cashflow.T
     balance_sheet = stock.balance_sheet.T
     
-
     # Extract necessary fields
     financial_data = {}
 
@@ -25,63 +24,64 @@ def fetch_financial_data(ticker, growth_assumption):
     market_return = 0.085
     growth_rate = 0.01
     perpetual_growth_rate = 0.02
-    growth_multiple = 8.3459 * (1.07) ** (growth_assumption - 4)
+    growth_multiple = 8.3459 * (1.07) ** (float(growth_assumption) - 4)
 
-   # Calculate Total Debt
-    financial_data['Total Debt']= balance_sheet['Total Debt'].iloc[0]
+    # Calculate Total Debt
+    financial_data['Total Debt'] = float(balance_sheet['Total Debt'].iloc[0])
 
     # Cash and Cash Equivalents
-    financial_data['Cash and Cash Equivalents'] = balance_sheet['Cash And Cash Equivalents'].iloc[0]
+    financial_data['Cash and Cash Equivalents'] = float(balance_sheet['Cash And Cash Equivalents'].iloc[0])
 
     # Invested Capital for 2023 and 2022
-    financial_data['Invested Capital 2023'] = balance_sheet['Total Assets'].iloc[0] - balance_sheet['Total Liabilities Net Minority Interest'].iloc[0]
-    financial_data['Invested Capital 2022'] = balance_sheet['Total Assets'].iloc[1] - balance_sheet['Total Liabilities Net Minority Interest'].iloc[1]
+    financial_data['Invested Capital 2023'] = float(balance_sheet['Total Assets'].iloc[0]) - float(balance_sheet['Total Liabilities Net Minority Interest'].iloc[0])
+    financial_data['Invested Capital 2022'] = float(balance_sheet['Total Assets'].iloc[1]) - float(balance_sheet['Total Liabilities Net Minority Interest'].iloc[1])
 
     # Interest Expense
     try:
-        financial_data['Interest Expense'] = income_statement['Interest Expense'].iloc[0]
+        financial_data['Interest Expense'] = float(income_statement['Interest Expense'].iloc[0])
     except (KeyError, IndexError):
-        financial_data['Interest Expense'] = 0
-
+        financial_data['Interest Expense'] = 0.0
 
     # Income Tax Expense
-    financial_data['Tax Provision'] = income_statement['Tax Provision'].iloc[0]
+    financial_data['Tax Provision'] = float(income_statement['Tax Provision'].iloc[0])
 
     # Income Before Tax
-    financial_data['Pretax Income'] = income_statement['Pretax Income'].iloc[0]
+    financial_data['Pretax Income'] = float(income_statement['Pretax Income'].iloc[0])
 
-     # Total Revenue
-    financial_data['Total Revenue'] = income_statement['Total Revenue'].iloc[0]
+    # Total Revenue
+    financial_data['Total Revenue'] = float(income_statement['Total Revenue'].iloc[0])
 
     # Operating Income
-    financial_data['Operating Income'] = income_statement['Operating Income'].iloc[0]
+    financial_data['Operating Income'] = float(income_statement['Operating Income'].iloc[0])
 
-    # Calculate Weight of Debt
-    financial_data['Effective Tax Rate'] = financial_data['Tax Provision'] / financial_data['Pretax Income']
-    financial_data['Cost of Debt'] = financial_data['Interest Expense'] / financial_data['Total Debt']
+    # Calculate Effective Tax Rate
+    financial_data['Effective Tax Rate'] = financial_data['Tax Provision'] / financial_data['Pretax Income'] if financial_data['Pretax Income'] != 0 else 0.0
+
+    # Calculate Cost of Debt
+    financial_data['Cost of Debt'] = financial_data['Interest Expense'] / financial_data['Total Debt'] if financial_data['Total Debt'] != 0 else 0.0
 
     # Market Cap
-    financial_data['Market Cap'] = stock.info['marketCap']
+    financial_data['Market Cap'] = float(stock.info.get('marketCap', 0.0))
 
     # Beta
-    financial_data['Beta'] = stock.info.get('beta', 'Not Found')
+    financial_data['Beta'] = float(stock.info.get('beta', 0.0))
 
     # Outstanding Shares
-    financial_data['Outstanding Shares'] = stock.info.get('sharesOutstanding', 'Not Found')
+    financial_data['Outstanding Shares'] = float(stock.info.get('sharesOutstanding', 0.0))
 
     # Operating Cash Flow
-    financial_data['Operating Cash Flow'] = cash_flow_statement['Operating Cash Flow'].iloc[0]
+    financial_data['Operating Cash Flow'] = float(cash_flow_statement['Operating Cash Flow'].iloc[0])
 
     # Capital Expenditure
-    financial_data['Capital Expenditure'] = cash_flow_statement['Capital Expenditure'].iloc[0]
+    financial_data['Capital Expenditure'] = float(cash_flow_statement['Capital Expenditure'].iloc[0])
 
-    # Calculate Debt Minus Market Cap
+    # Calculate Debt plus Market Cap
     financial_data['Debt plus Market Cap'] = financial_data['Total Debt'] + financial_data['Market Cap']
 
-    # Calculate Weight of Debt
-    financial_data['Weight of Debt'] = financial_data['Total Debt'] / financial_data['Debt plus Market Cap']
+    # Calculate Weight of Debt and Equity
+    financial_data['Weight of Debt'] = financial_data['Total Debt'] / financial_data['Debt plus Market Cap'] if financial_data['Debt plus Market Cap'] != 0 else 0.0
     financial_data['Cost of Debt After Tax'] = financial_data['Cost of Debt'] * (1 - financial_data['Effective Tax Rate'])
-    financial_data['Weight of Equity'] = financial_data['Market Cap'] / financial_data['Debt plus Market Cap']
+    financial_data['Weight of Equity'] = financial_data['Market Cap'] / financial_data['Debt plus Market Cap'] if financial_data['Debt plus Market Cap'] != 0 else 0.0
 
     # Calculate Cost of Equity
     financial_data['Cost of Equity'] = risk_free_rate + (financial_data['Beta'] * (market_return - risk_free_rate))
@@ -93,14 +93,13 @@ def fetch_financial_data(ticker, growth_assumption):
     financial_data['NOPAT'] = financial_data['Operating Income'] * (1 - financial_data['Effective Tax Rate']) 
 
     # Calculate ROIC
-    financial_data['ROIC'] = financial_data['NOPAT'] / ((financial_data['Invested Capital 2023'] + financial_data['Invested Capital 2022']) / 2)
+    average_invested_capital = (financial_data['Invested Capital 2023'] + financial_data['Invested Capital 2022']) / 2
+    financial_data['ROIC'] = financial_data['NOPAT'] / average_invested_capital if average_invested_capital != 0 else 0.0
 
-   
+    # Calculate Free Cash Flow
+    financial_data['Free Cash Flow'] = financial_data['Operating Cash Flow'] - abs(financial_data['Capital Expenditure'])
 
-   # Calculate Free Cash Flow
-    financial_data['Free Cash Flow'] = cash_flow_statement['Operating Cash Flow'].iloc[0] - abs(cash_flow_statement['Capital Expenditure'].iloc[0])
-
-# Projected Cash Flows for 5 Years
+    # Projected Cash Flows for 5 Years
     financial_data['Projected Cash Flows'] = []
     previous_cash_flow = financial_data['Free Cash Flow']
     for year in range(1, 6):
@@ -109,66 +108,62 @@ def fetch_financial_data(ticker, growth_assumption):
         financial_data['Projected Cash Flows'].append(projected_cash_flow)
         previous_cash_flow = projected_cash_flow
 
-# Terminal Value Calculation
-    if financial_data['WACC'] <= perpetual_growth_rate:
-        st.error("WACC must be greater than the perpetual growth rate to calculate Terminal Value.")
-    else:
+    # Terminal Value Calculation
+    if financial_data['WACC'] > perpetual_growth_rate:
         financial_data['Terminal Value'] = financial_data['Projected Cash Flow Year 5'] * (1 + perpetual_growth_rate) / (financial_data['WACC'] - perpetual_growth_rate)
+    else:
+        financial_data['Terminal Value'] = 0.0  # Set to 0 or raise an error depending on how you want to handle this
 
-# Enterprise Value Calculation
-    financial_data['Enterprise Value'] = npf.npv(financial_data['WACC']/100, financial_data['Projected Cash Flows']) + financial_data['Terminal Value'] / ((1 + financial_data['WACC']/100) ** 5)
+    # Enterprise Value Calculation
+    financial_data['Enterprise Value'] = npf.npv(financial_data['WACC'], financial_data['Projected Cash Flows']) + financial_data['Terminal Value'] / ((1 + financial_data['WACC']) ** 5)
 
-# Calculate Equity Value
+    # Calculate Equity Value
     financial_data['Equity Value'] = financial_data['Enterprise Value'] - financial_data['Total Debt'] + financial_data['Cash and Cash Equivalents']
 
-# Calculate Intrinsic Value 5 Year Projected Cash Flow
-    if financial_data['Outstanding Shares'] == 0:
-        st.error("Outstanding Shares cannot be zero.")
-    else:
+    # Calculate Intrinsic Value 5 Year Projected Cash Flow
+    if financial_data['Outstanding Shares'] != 0:
         financial_data['Intrinsic Value 5 Year Projected Cash Flow'] = financial_data['Equity Value'] / financial_data['Outstanding Shares']
+    else:
+        financial_data['Intrinsic Value 5 Year Projected Cash Flow'] = 0.0  # Handle as per your needs
 
-    
+    # Calculate Free Cash Flow for the last 4 years
+    for i in range(1, 5):
+        year = datetime.datetime.now().year - i
+        try:
+            financial_data[f'Free Cash flow year {year}'] = float(cash_flow_statement.loc[str(year), 'Free Cash Flow'].iloc[0])
+        except KeyError:
+            financial_data[f'Free Cash flow year {year}'] = 0.0  # Default to 0 if the data is missing
 
-    
-    # Free Cash flow year 2023
-    financial_data[f'Free Cash flow year {datetime.datetime.now().year -1 }'] = cash_flow_statement.loc[str(datetime.datetime.now().year -1 ), 'Free Cash Flow'].iloc[0]
-
-    # Free Cash flow year 2022
-    financial_data[f'Free Cash flow year {datetime.datetime.now().year -2 }'] = cash_flow_statement.loc[str(datetime.datetime.now().year -2 ), 'Free Cash Flow'].iloc[0]
-
-    # Free Cash flow year 2021
-    financial_data[f'Free Cash flow year {datetime.datetime.now().year -3 }'] = cash_flow_statement.loc[str(datetime.datetime.now().year -3 ), 'Free Cash Flow'].iloc[0]
-
-    # Free Cash flow year 2020
-    financial_data[f'Free Cash flow year {datetime.datetime.now().year -4 }'] = cash_flow_statement.loc[str(datetime.datetime.now().year -4 ), 'Free Cash Flow'].iloc[0]
-
-        
     # Total Equity
-    financial_data['Total Equity'] = balance_sheet['Total Equity Gross Minority Interest'].iloc[0]
+    financial_data['Total Equity'] = float(balance_sheet['Total Equity Gross Minority Interest'].iloc[0])
 
     # Mean Cash Flow
-    financial_data['Mean Cash Flow 4 years'] = (financial_data[f'Free Cash flow year {datetime.datetime.now().year -1 }']+ financial_data[f'Free Cash flow year {datetime.datetime.now().year -2 }']+ financial_data[f'Free Cash flow year {datetime.datetime.now().year -3 }']+financial_data[f'Free Cash flow year {datetime.datetime.now().year -4 }']) / 4
- 
+    financial_data['Mean Cash Flow 4 years'] = sum(
+        financial_data[f'Free Cash flow year {datetime.datetime.now().year - i}'] for i in range(1, 5)
+    ) / 4
+
     # Value
     financial_data['Value'] = growth_multiple * financial_data['Mean Cash Flow 4 years'] + 0.8 * financial_data['Total Equity']
 
     # Intrinsic Value 
-    financial_data['Intrinsic Value'] = financial_data['Value'] / financial_data['Outstanding Shares']    
+    if financial_data['Outstanding Shares'] != 0:
+        financial_data['Intrinsic Value'] = financial_data['Value'] / financial_data['Outstanding Shares']
+    else:
+        financial_data['Intrinsic Value'] = 0.0  # Handle as per your needs
 
     # Operating Margin
-    financial_data['Operating Margin'] = financial_data['Operating Income'] / financial_data['Total Revenue']
+    financial_data['Operating Margin'] = financial_data['Operating Income'] / financial_data['Total Revenue'] if financial_data['Total Revenue'] != 0 else 0.0
 
-    
     # Debt/EBITDA
-    ebitda = income_statement['EBITDA'].iloc[0]
-    financial_data['Debt/EBITDA'] = financial_data['Total Debt'] / ebitda if ebitda else None
+    ebitda = float(income_statement.get('EBITDA', [0.0])[0])
+    financial_data['Debt/EBITDA'] = financial_data['Total Debt'] / ebitda if ebitda != 0 else None
     
     # P/E Ratio
     financial_data['P/E Ratio'] = stock.info.get('trailingPE', 'Not Found')
     
     # PEG Ratio
     financial_data['PEG Ratio'] = stock.info.get('pegRatio', 'Not Found')
-    
+
     return financial_data
 
 def fetch_piotroski(ticker):
