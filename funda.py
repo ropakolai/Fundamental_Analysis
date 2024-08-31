@@ -64,7 +64,7 @@ def fetch_financial_data(ticker, growth_assumption):
     financial_data['Market Cap'] = stock.info['marketCap']
 
     # Beta
-    financial_data['Beta'] = stock.info['beta']
+    financial_data['Beta'] = stock.info.get['beta', 'Not Found']
 
     # Outstanding Shares
     financial_data['Outstanding Shares'] = stock.info['sharesOutstanding']
