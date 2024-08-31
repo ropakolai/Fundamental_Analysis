@@ -67,7 +67,7 @@ def fetch_financial_data(ticker, growth_assumption):
     financial_data['Beta'] = stock.info.get('beta', 'Not Found')
 
     # Outstanding Shares
-    financial_data['Outstanding Shares'] = stock.info['sharesOutstanding']
+    financial_data['Outstanding Shares'] = stock.info.get('sharesOutstanding', 'Not Found')
 
     # Operating Cash Flow
     financial_data['Operating Cash Flow'] = cash_flow_statement['Operating Cash Flow'].iloc[0]
