@@ -214,7 +214,7 @@ def fetch_piotroski(ticker):
         asset_turnover_prev = income_statement['Total Revenue'].iloc[previous_year] / total_assets_prev
 
         # Get shares outstanding
-        shares_outstanding = stock.info.get['sharesOutstanding', 'Not Found']
+        shares_outstanding = stock.info.get('sharesOutstanding', 'Not Found')
 
         # Calculate F-Score components
         profitability_score = 0
